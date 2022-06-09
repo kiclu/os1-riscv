@@ -20,8 +20,12 @@ extern "C"{
 
 extern time_t tick_count;
 
-extern void intrvec();
-inline void set_stvec(){ write_stvec((uint64)intrvec); }
+extern void kintrvec();
+
+extern void uintrvec();
+extern void uintrret();
+
+inline void set_stvec(void(*vec)()){ write_stvec((uint64)vec); }
 
 inline void intr_enable(){ write_sstatus(read_sstatus() | (1UL << 1)); }
 inline void intr_disable(){ write_sstatus(read_sstatus() & ~(1UL << 1)); }

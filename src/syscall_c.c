@@ -106,3 +106,8 @@ void putc(char c){
     asm volatile("mv a0, %0" :: "r"(0x42));
     asm volatile("ecall");
 }
+
+void user_mode(){
+    asm volatile("mv a0, %0" :: "r"(0x51));
+    asm volatile("ecall");
+}

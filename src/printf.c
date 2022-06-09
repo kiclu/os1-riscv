@@ -8,7 +8,7 @@ static const char* digits = "0123456789abcdef";
 static const char* capital_digits = "0123456789ABCDEF";
 
 void print_str(const char* arg){
-    for(int i = 0; arg[i] != '\0'; ++i) putc(arg[i]);
+    for(int i = 0; arg[i] != '\0'; ++i) __putc(arg[i]);
 }
 
 void print_uint8(uint8 arg, uint8 base, char uppercase){
@@ -18,7 +18,7 @@ void print_uint8(uint8 arg, uint8 base, char uppercase){
         buffer[i++] = uppercase ? capital_digits[arg % base] : digits[arg % base];
         arg /= base;
     }while(arg);
-    for(int j = i - 1; j >= 0; --j) putc(buffer[j]);
+    for(int j = i - 1; j >= 0; --j) __putc(buffer[j]);
 }
 
 void print_uint16(uint16 arg, uint8 base, char uppercase){
@@ -28,7 +28,7 @@ void print_uint16(uint16 arg, uint8 base, char uppercase){
         buffer[i++] = uppercase ? capital_digits[arg % base] : digits[arg % base];
         arg /= base;
     }while(arg);
-    for(int j = i - 1; j >= 0; --j) putc(buffer[j]);
+    for(int j = i - 1; j >= 0; --j) __putc(buffer[j]);
 }
 
 void print_uint32(uint32 arg, uint8 base, char uppercase){
@@ -38,7 +38,7 @@ void print_uint32(uint32 arg, uint8 base, char uppercase){
         buffer[i++] = uppercase ? capital_digits[arg % base] : digits[arg % base];
         arg /= base;
     }while(arg);
-    for(int j = i - 1; j >= 0; --j) putc(buffer[j]);
+    for(int j = i - 1; j >= 0; --j) __putc(buffer[j]);
 }
 
 void print_uint64(uint64 arg, uint8 base, char uppercase){
@@ -48,12 +48,12 @@ void print_uint64(uint64 arg, uint8 base, char uppercase){
         buffer[i++] = digits[arg % base];
         arg /= base;
     }while(arg);
-    for(int j = i - 1; j >= 0; --j) putc(buffer[j]);
+    for(int j = i - 1; j >= 0; --j) __putc(buffer[j]);
 }
 
 void print_schar(signed char arg){
     if(arg < 0){
-        putc('-');
+        __putc('-');
         arg *= -1;
     }
     print_uint8((uint8)arg, 10, 0);
@@ -61,7 +61,7 @@ void print_schar(signed char arg){
 
 void print_short(short arg){
     if(arg < 0){
-        putc('-');
+        __putc('-');
         arg *= -1;
     }
     print_uint16((uint16)arg, 10, 0);
@@ -69,7 +69,7 @@ void print_short(short arg){
 
 void print_int(int arg){
     if(arg < 0){
-        putc('-');
+        __putc('-');
         arg *= -1;
     }
     print_uint32((uint32)arg, 10, 0);
@@ -77,7 +77,7 @@ void print_int(int arg){
 
 void print_long(long arg){
     if(arg < 0){
-        putc('-');
+        __putc('-');
         arg *= -1;
     }
     print_uint64((uint64)arg, 10, 0);
@@ -101,16 +101,16 @@ void printf(const char* fmt, ...){
 
     for(int i = 0; fmt[i] != '\0'; ++i){
         if(fmt[i] != '%'){
-            putc(fmt[i]);
+            __putc(fmt[i]);
             continue;
         }
 
         ++i;
         switch(fmt[i]){
-            case '%': putc('%'); break;
+            case '%': __putc('%'); break;
 
             // specifiers
-            case 'c': putc((char)arg[k++]); break;                // char
+            case 'c': __putc((char)arg[k++]); break;                // char
             case 's': print_str((const char*)arg[k++]); break;      // string
             case 'd': case 'i': print_int((int)arg[k++]); break;    // int
             case 'o': print_uint32((uint)arg[k++], 8, 0); break;    // octal

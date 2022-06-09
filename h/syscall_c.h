@@ -29,6 +29,8 @@ int time_sleep(time_t);
 char getc();
 void putc(char);
 
+void user_mode();
+
 #ifdef  __cplusplus
 }
 #endif//__cplusplus
