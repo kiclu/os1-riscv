@@ -1,6 +1,6 @@
-.globl uintrvec
-.globl uintrret
-.globl uintr_handler
+.globl intrvec
+.globl intrret
+.globl intr_handler
 
 .globl kintrvec
 .globl kintr_handler
@@ -9,8 +9,7 @@
 .globl kernel_thread
 .align 4
 
-
-uintrvec:
+intrvec:
     # save t0 to sscratch
     csrw sscratch, t0
 
@@ -61,9 +60,9 @@ uintrvec:
     ld sp, kernel_thread
     ld sp, 0x08(sp)
 
-    jal uintr_handler
+    jal intr_handler
 
-uintrret:
+intrret:
     ld a0, kernel_thread
     sd sp, 0x08(a0)
 

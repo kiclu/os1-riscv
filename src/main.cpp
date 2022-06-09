@@ -12,7 +12,7 @@ void main(){
     mem_init();
     thread_init();
     sched_init();
-    set_stvec(uintrvec);
+    set_stvec(intrvec);
     intr_enable();
     user_mode();
 

@@ -22,8 +22,8 @@ extern time_t tick_count;
 
 extern void kintrvec();
 
-extern void uintrvec();
-extern void uintrret();
+extern void intrvec();
+extern void intrret();
 
 inline void set_stvec(void(*vec)()){ write_stvec((uint64)vec); }
 
@@ -35,8 +35,6 @@ inline void sip_disable(uint64 sip_flag){ write_sip(read_sip() & ~sip_flag); }
 
 inline void sie_enable(uint64 sie_flag){ write_sie(read_sie() | sie_flag); }
 inline void sie_disable(uint64 sie_flag){ write_sie(read_sie() & ~sie_flag); }
-
-void intr_handler();
 
 #ifdef __cplusplus
 }

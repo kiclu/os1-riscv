@@ -23,7 +23,7 @@ void sync_ctx_switch(){
     if(running->cpu_time >= DEFAULT_TIME_SLICE) __thread_dispatch();
 }
 
-void uintr_handler(){
+void intr_handler(){
     running->pc = read_sepc();
     uint64 sstatus = read_sstatus();
     uint64 scause = read_scause();
@@ -171,12 +171,12 @@ void uintr_handler(){
     }
 
     //intr_disable();
-    set_stvec(uintrvec);
+    set_stvec(intrvec);
 
     write_sepc(running->pc);
     write_sstatus(sstatus);
 
-    uintrret();
+    intrret();
 }
 
 void kintr_handler(){
