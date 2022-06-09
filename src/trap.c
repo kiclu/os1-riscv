@@ -61,10 +61,8 @@ void intr_handler(){
 
         // instruction access fault
         if((scause & 0xFF) == 0x01){
-            /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            forcefully exits the thread if it has reached the end
-            but has not been terminated properly with thread_exit();
-            !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
+            // forcefully exits the thread if it has reached the end
+            // but has not been terminated properly with thread_exit();
             __thread_exit();
         }
 
@@ -187,7 +185,7 @@ void uintr_handler(){
     uint64 sstatus = read_sstatus();
     uint64 scause = read_scause();
 
-    printf("uintr | scause: %lx\n", scause);
+    printf("uintr | scause: %lx | sepc: %lx\n", scause, running->pc);
 
     set_stvec(kintrvec);
     //intr_enable();
@@ -225,10 +223,8 @@ void uintr_handler(){
 
         // instruction access fault
         if((scause & 0xFF) == 0x01){
-            /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            forcefully exits the thread if it has reached the end
-            but has not been terminated properly with thread_exit();
-            !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
+            // forcefully exits the thread if it has reached the end
+            // but has not been terminated properly with thread_exit();
             __thread_exit();
         }
 
@@ -252,8 +248,7 @@ void uintr_handler(){
 
         // ecnvironment all from U mode
         if((scause & 0xFF) == 0x08){
-            //running->pc += 4;
-
+            running->pc += 4;
             // load ecall arguments to a0-a5 registers
             asm volatile("mv a4, %0" :: "r"(running->context.a4));
             asm volatile("mv a3, %0" :: "r"(running->context.a3));
@@ -347,11 +342,11 @@ void uintr_handler(){
 }
 
 void kintr_handler(){
-    //running->pc = read_sepc();
+    uint64 sepc = read_sepc();
     uint64 sstatus = read_sstatus();
     uint64 scause = read_scause();
 
-    printf("kintr | scause: %lx\n", scause);
+    printf("kintr | scause: %lx | sepc: %lx\n", scause, sepc);
 
     if(scause & SC_INTERRUPT){
         if((scause & 0xFF) == 1){
@@ -371,7 +366,7 @@ void kintr_handler(){
     else{
         // environment call from S mode
         if((scause & 0xFF) == 0x09){
-            running->pc += 4;
+            sepc += 4;
             uint64* args = (uint64*)(&(running->context.a0));
             switch(args[0]){
                 // void* mem_alloc(size_t);
@@ -423,6 +418,6 @@ void kintr_handler(){
         }
     }
 
-    //write_sepc(running->pc);
+    write_sepc(sepc);
     write_sstatus(sstatus);
 }
