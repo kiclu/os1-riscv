@@ -16,10 +16,5 @@ void main(){
     intr_enable();
     user_mode();
 
-    //printf("Hello world!\n");
-    putc('1');
-    putc('2');
-
-    for(;;);
-    //userMain();
+    printf("Hello world!\n");
 }
