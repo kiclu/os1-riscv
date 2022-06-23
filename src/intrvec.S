@@ -14,7 +14,7 @@ intrvec:
     sd ra,  0x00(t0)
     sd sp,  0x08(t0)
     sd gp,  0x10(t0)
-    sd tp,  0x18(t0)
+    #sd tp,  0x18(t0)
     # save t0 later
     sd t1,  0x28(t0)
     sd t2,  0x30(t0)
@@ -66,6 +66,7 @@ intrvec:
     ld ra,  0x00(t0)
     ld sp,  0x08(t0)
     ld gp,  0x10(t0)
+    #ld tp,  0x18(t0)
     # load t0 later
     ld t1,  0x28(t0)
     ld t2,  0x30(t0)
@@ -95,5 +96,4 @@ intrvec:
     ld t6,  0xF0(t0)
 
     ld t0, 0x20(t0)
-
     sret
