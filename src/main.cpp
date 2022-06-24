@@ -4,6 +4,8 @@
 #include"../h/thread.h"
 #include"../h/trap.h"
 
+#include"../h/printf.h"
+
 extern void userMain();
 
 void main(){
@@ -14,5 +16,5 @@ void main(){
     intr_enable();
     user_mode();
 
-    userMain();
+    printf("Hello world!\n");
 }
