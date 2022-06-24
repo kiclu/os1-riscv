@@ -78,12 +78,12 @@ int __sem_wait(sem_t id){
         return 0;
     }
 
-    intr_enable();
+    // intr_enable();
     thread_t new = NULL;
     while((new = sched()) == NULL){
-        intr_disable();
+        // intr_disable();
         if(id->value > 0){ --id->value; return 0; }
-        intr_enable();
+        // intr_enable();
     }
     yield_sem(new, id);
 

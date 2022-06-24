@@ -20,12 +20,7 @@ extern "C"{
 
 extern time_t tick_count;
 
-extern void kintrvec();
-
 extern void intrvec();
-extern void intrret();
-
-inline void set_stvec(void(*vec)()){ write_stvec((uint64)vec); }
 
 inline void intr_enable(){ write_sstatus(read_sstatus() | (1UL << 1)); }
 inline void intr_disable(){ write_sstatus(read_sstatus() & ~(1UL << 1)); }
@@ -35,6 +30,8 @@ inline void sip_disable(uint64 sip_flag){ write_sip(read_sip() & ~sip_flag); }
 
 inline void sie_enable(uint64 sie_flag){ write_sie(read_sie() | sie_flag); }
 inline void sie_disable(uint64 sie_flag){ write_sie(read_sie() & ~sie_flag); }
+
+inline void set_stvec(void(*stvec)()){ write_stvec((uint64)stvec); }
 
 #ifdef __cplusplus
 }
