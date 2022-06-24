@@ -17,7 +17,7 @@ int __sem_open(sem_t* handle, uint value){
     *handle = __kmem_alloc(SEM_SIZE);
     if(*handle == NULL) return -1;
 
-    (*handle)->value = value;
+    (*handle)->value = (int)value;
     (*handle)->blocked_queue_front = (*handle)->blocked_queue_back = NULL;
     return 0;
 }
@@ -78,12 +78,9 @@ int __sem_wait(sem_t id){
         return 0;
     }
 
-    // intr_enable();
     thread_t new = NULL;
     while((new = sched()) == NULL){
-        // intr_disable();
         if(id->value > 0){ --id->value; return 0; }
-        // intr_enable();
     }
     yield_sem(new, id);
 

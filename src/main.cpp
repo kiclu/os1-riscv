@@ -16,5 +16,5 @@ void main(){
     intr_enable();
     user_mode();
 
-    printf("Hello world!\n");
+    userMain();
 }
