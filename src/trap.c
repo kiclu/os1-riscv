@@ -17,16 +17,27 @@
 
 time_t tick_count = 0;
 
-extern void kintrvec();
-
+// asynchonous context switching
 static int async_ctx_switched = 0;
 
-void async_ctx_switch(){
+static void async_ctx_switch(){
     ++running->cpu_time;
     if(running->cpu_time >= DEFAULT_TIME_SLICE){
         __thread_dispatch();
     }
 }
+
+// hardware interrupt handling
+static void hw_interrupt(){
+    int irq = plic_claim();
+    switch(irq){
+        case CONSOLE_IRQ: console_handler(); break;
+    }
+    if(irq) plic_complete(irq);
+}
+
+// trap handler
+extern void kintrvec();
 
 void intr_handler(){
     running->pc = read_sepc();
@@ -52,7 +63,7 @@ void intr_handler(){
         // supervisor external interrupt
         if((scause & 0xFF) == 9){
             sip_disable(SI_EXTERNAL);
-            console_handler();
+            hw_interrupt();
         }
     }
     // exception
@@ -233,7 +244,7 @@ void kintr_handler(){
         // supervisor external interrupt
         if((scause & 0xFF) == 9){
             sip_disable(SI_EXTERNAL);
-            console_handler();
+            hw_interrupt();
         }
     }
 

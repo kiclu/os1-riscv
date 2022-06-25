@@ -9,12 +9,16 @@
 extern void userMain();
 
 void main(){
+    set_stvec(intrvec);
     mem_init();
     thread_init();
     sched_init();
-    set_stvec(intrvec);
+    console_init();
     intr_enable();
     user_mode();
 
+    printf("Hello World!\n");
+
     userMain();
+    console_shutdown();
 }
