@@ -19,16 +19,20 @@ time_t tick_count = 0;
 
 extern void kintrvec();
 
-void sync_ctx_switch(){
+static int async_ctx_switched = 0;
+
+void async_ctx_switch(){
     ++running->cpu_time;
-    if(running->cpu_time >= DEFAULT_TIME_SLICE) __thread_dispatch();
+    if(running->cpu_time >= DEFAULT_TIME_SLICE){
+        __thread_dispatch();
+    }
 }
 
 void intr_handler(){
     running->pc = read_sepc();
     uint64 sstatus = read_sstatus();
     uint64 scause = read_scause();
-
+    async_ctx_switched = 0;
     set_stvec(kintrvec);
 
     // interrupt
@@ -36,9 +40,8 @@ void intr_handler(){
         // supervisor software interrupt
         if((scause & 0xFF) == 1){
             sip_disable(SI_SOFTWARE);
-
             ++tick_count;
-            sync_ctx_switch();
+            if(!async_ctx_switched) async_ctx_switch();
         }
 
         // supervisor timer interrupt
@@ -219,6 +222,7 @@ void kintr_handler(){
         if((scause & 0xFF) == 1){
             sip_disable(SI_SOFTWARE);
             ++tick_count;
+            if(!async_ctx_switched) async_ctx_switch();
         }
 
         // supervisor timer interrupt
