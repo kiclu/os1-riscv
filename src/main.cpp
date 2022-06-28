@@ -18,6 +18,6 @@ void main(){
     user_mode();
 
     userMain();
-    
+
     console_shutdown();
 }
