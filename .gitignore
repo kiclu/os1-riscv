@@ -1,0 +1,7 @@
+# build files
+build/
+kernel
+kernel.asm
+
+# output logs
+logs/

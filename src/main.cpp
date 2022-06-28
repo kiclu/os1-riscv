@@ -13,8 +13,11 @@ void main(){
     thread_init();
     sched_init();
     set_stvec(intrvec);
+    console_init();
     intr_enable();
     user_mode();
 
-    printf("Hello world!\n");
+    userMain();
+
+    console_shutdown();
 }
