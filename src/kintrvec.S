@@ -6,10 +6,10 @@
 kintrvec:
     addi sp, sp, -256
 
+    # push kernel thread context to stack
     sd ra,  0x00(sp)
     sd sp,  0x08(sp)
     sd gp,  0x10(sp)
-    #sd tp,  0x18(sp)
     sd t0,  0x20(sp)
     sd t1,  0x28(sp)
     sd t2,  0x30(sp)
@@ -38,12 +38,13 @@ kintrvec:
     sd t5,  0xE8(sp)
     sd t6,  0xF0(sp)
 
+    # call kernel interrupt handler
     call kintr_handler
 
+    # load kernel thread context from stack
     ld ra,  0x00(sp)
     ld sp,  0x08(sp)
     ld gp,  0x10(sp)
-    #ld tp,  0x18(sp)
     ld t0,  0x20(sp)
     ld t1,  0x28(sp)
     ld t2,  0x30(sp)

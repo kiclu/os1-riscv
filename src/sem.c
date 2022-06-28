@@ -79,9 +79,7 @@ int __sem_wait(sem_t id){
     if(id->value > 0){ --id->value; return 0; }
 
     // else block thread and yield
-    thread_t new = NULL;
-    while((new = sched()) == NULL);
-    yield_sem(new, id);
+    yield_sem(sched(), id);
 
     return 0;
 }
@@ -89,10 +87,12 @@ int __sem_wait(sem_t id){
 int __sem_signal(sem_t id){
     if(id == NULL) return -1;
     
-    // if there are threads waiting, unblock one and return
-    // else increment value and return
     thread_t blocked = queue_sem_pop(id);
+    
+    // if no threads are blocked on this semaphore, increment value and return
     if(blocked == NULL) ++id->value;
+
+    // if there is a blocked thread, unblock it and place it in the waiting queue
     else queue_waiting_push(blocked);
 
     return 0;
