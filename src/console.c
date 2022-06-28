@@ -2,6 +2,7 @@
 
 #include"../h/sem.h"
 #include"../h/syscall_c.h"
+#include"../h/trap.h"
 
 typedef struct _uart_buffer{
     char data[UART_BUFFER_SIZE];
@@ -17,43 +18,56 @@ typedef struct _uart_buffer{
 static _uart_buffer output_buffer;
 static _uart_buffer input_buffer;
 
-// static void uart_buffer_push(_uart_buffer* buf, char c){
-//     __sem_wait(buf->full);
-//     __sem_wait(buf->mutex);
+static void uart_buffer_push(_uart_buffer* buf, char c){
+    __sem_wait(buf->full);
+    __sem_wait(buf->mutex);
 
-//     buf->data[buf->w++] = c;
-//     buf->w %= UART_BUFFER_SIZE;
+    __putc('+');
 
-//     __sem_signal(buf->mutex);
-//     __sem_signal(buf->empty);
-// }
+    buf->data[buf->w++] = c;
+    buf->w %= UART_BUFFER_SIZE;
 
-// static char uart_buffer_pop(_uart_buffer* buf){
-//     __sem_wait(buf->empty);
-//     __sem_wait(buf->mutex);
+    __sem_signal(buf->mutex);
+    __sem_signal(buf->empty);
+}
 
-//     char c = buf->data[buf->r++];
-//     buf->r %= UART_BUFFER_SIZE;
+static char uart_buffer_pop(_uart_buffer* buf){
+    __sem_wait(buf->empty);
+    __sem_wait(buf->mutex);
 
-//     __sem_signal(buf->mutex);
-//     __sem_signal(buf->full);
+    __putc('-');
 
-//     return c;
-// }
+    char c = buf->data[buf->r++];
+    buf->r %= UART_BUFFER_SIZE;
+
+    __sem_signal(buf->mutex);
+    __sem_signal(buf->full);
+
+    return c;
+}
 
 static void uart_putc(char c){ *(char*)CONSOLE_TX_DATA = c; }
-//static char uart_getc(){ return *(char*)CONSOLE_RX_DATA; }
+static char uart_getc(){ return *(char*)CONSOLE_RX_DATA; }
 
-static void uart_output(void* arg){
-    for(;;){
-        while(*(char*)CONSOLE_STATUS & CONSOLE_TX_STATUS_BIT && output_buffer.count){
-            uart_putc(output_buffer.data[output_buffer.r++]);
-            output_buffer.r %= UART_BUFFER_SIZE;
-            --output_buffer.count;
-        }
-        thread_dispatch();
+static void uart_output(){
+    while(*(char*)CONSOLE_STATUS & CONSOLE_TX_STATUS_BIT && output_buffer.count){
+        uart_putc(output_buffer.data[output_buffer.r++]);
+        output_buffer.r %= UART_BUFFER_SIZE;
+        --output_buffer.count;
     }
 }
+
+static void uart_input(){
+    while(*(char*)CONSOLE_STATUS & CONSOLE_RX_STATUS_BIT){
+        uart_buffer_push(&input_buffer, uart_getc());
+    }
+}
+
+static void output_handler(void* arg){
+    for(;;){ uart_output(); thread_dispatch(); }
+}
+
+void console_handler(){ uart_input(); }
 
 void __putc(char c){
     if(output_buffer.count < UART_BUFFER_SIZE){
@@ -63,25 +77,20 @@ void __putc(char c){
     }
 }
 
-char __getc(){ return '\0'; }
-
-void console_handler(){
-    // while(*(char*)CONSOLE_STATUS & CONSOLE_RX_STATUS_BIT){
-    //     uart_buffer_push(&input_buffer, uart_getc());
-    // }
-}
+char __getc(){ return uart_buffer_pop(&input_buffer); }
 
 void console_init(){
     output_buffer.r = output_buffer.w = 0;
     output_buffer.count = 0;
 
     thread_t uart_output_thread = NULL;
-    __thread_create(&uart_output_thread, uart_output, NULL, __kmem_alloc(DEFAULT_STACK_SIZE));
+    thread_create(&uart_output_thread, output_handler, NULL);
 
-    input_buffer.r = input_buffer.w = 0;
-    __sem_open(&input_buffer.full, UART_BUFFER_SIZE);
-    __sem_open(&input_buffer.empty, 0);
-    __sem_open(&input_buffer.mutex, 1);
+    input_buffer.r = 0;
+    input_buffer.w = 0;
+    sem_open(&input_buffer.full, UART_BUFFER_SIZE - 1);
+    sem_open(&input_buffer.empty, 0);
+    sem_open(&input_buffer.mutex, 1);
 }
 
 void console_shutdown(){
