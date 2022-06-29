@@ -4,7 +4,7 @@
 // #include "../test/ConsumerProducer_C_API_test.h"
 // #include "../test/ConsumerProducer_CPP_Sync_API_test.hpp"
 
-// #include "../test/ThreadSleep_C_API_test.hpp"
+#include "../test/ThreadSleep_C_API_test.hpp"
 // #include "../test/ConsumerProducer_CPP_API_test.hpp"
 
 void userMain() {
@@ -14,6 +14,6 @@ void userMain() {
     // producerConsumer_C_API();
     // producerConsumer_CPP_Sync_API(); // TODO: fix buffer delete
 
-    // testSleeping();
+    testSleeping();
     // ConsumerProducerCPP::testConsumerProducer();
 }

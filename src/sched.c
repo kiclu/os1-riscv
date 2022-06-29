@@ -59,35 +59,46 @@ static thread_t queue_waiting_pop(){
 
 extern time_t tick_count;
 
-void queue_sleeping_push(thread_t thr, time_t wake_time){
+// insert thread into sorted sleeping queue
+void queue_sleeping_push(thread_t thr, time_t time){
+    time_t wake_time = tick_count + time;
+
     thr->state = SLEEPING;
-    thr->queue_next = NULL;
     thr->wake_time = wake_time;
+    thr->queue_next = NULL;
 
     if(queue_sleeping.front == NULL){
         queue_sleeping.front = queue_sleeping.back = thr;
         return;
     }
 
-    if(wake_time < queue_sleeping.front->wake_time){
-        thr->queue_next = queue_sleeping.front;
-        queue_sleeping.front = thr;
-        return;
-    }
-
-    for(thread_t i = queue_sleeping.front; i; i = i->queue_next){
-        if(i->wake_time <= wake_time && wake_time < i->queue_next->wake_time){
-            thr->queue_next = i->queue_next;
-            if(i->queue_next) i->queue_next = thr;
+    thread_t cur = queue_sleeping.front;
+    thread_t prev = NULL;
+    while(cur != NULL){
+        if(cur->wake_time > wake_time){
+            if(prev == NULL){
+                queue_sleeping.front = thr;
+                thr->queue_next = cur;
+                return;
+            }
+            prev->queue_next = thr;
+            thr->queue_next = cur;
+            return;
         }
+        prev = cur;
+        cur = cur->queue_next;
     }
+    queue_sleeping.back->queue_next = thr;
+    queue_sleeping.back = thr;
 }
 
+// pop first elem from sleeping queue if wake time is greater than tick count
 static thread_t queue_sleeping_pop(){
     if(queue_sleeping.front == NULL) return NULL;
-    if(queue_sleeping.front->wake_time < tick_count) return NULL;
     thread_t res = queue_sleeping.front;
+    if(res->wake_time > tick_count) return NULL;
     queue_sleeping.front = queue_sleeping.front->queue_next;
+    if(queue_sleeping.front == NULL) queue_sleeping.back = NULL;
     res->queue_next = NULL;
     return res;
 }
@@ -106,3 +117,5 @@ void sched_init(){
     queue_sleeping.front = queue_sleeping.back = NULL;
     queue_exited.front = queue_exited.back = NULL;
 }
+
+
