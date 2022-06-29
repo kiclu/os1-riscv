@@ -50,7 +50,7 @@ int __sem_open(sem_t* handle, uint value){
     *handle = __kmem_alloc(SEM_SIZE);
     if(*handle == NULL) return -1;
 
-    (*handle)->value = (int)value;
+    (*handle)->value = value;
     (*handle)->blocked_queue_front = (*handle)->blocked_queue_back = NULL;
     return 0;
 }

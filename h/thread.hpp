@@ -21,11 +21,11 @@ public:
     static int sleep(time_t time){ return time_sleep(time); }
 protected:
     Thread(){}
-    virtual void run(){}
+    virtual void run(){ m_start_routine(m_arg); }
 private:
     thread_t m_handle = NULL;
-    void(*m_start_routine)(void*);
-    void* m_arg;
+    void(*m_start_routine)(void*) = NULL;
+    void* m_arg = NULL;
     
     friend void wrapper(void* thr){ if(thr) ((Thread*)thr)->run(); }
 };
