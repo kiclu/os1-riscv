@@ -7,9 +7,7 @@ DEBUG_FLAG = -D DEBUG_PRINT=0
 KERNEL_IMG = kernel
 KERNEL_ASM = kernel.asm
 
-LIBS = \
-  ${DIR_LIBS}/hw.lib	#\
-  ${DIR_LIBS}/console.lib
+LIBS = ${DIR_LIBS}/hw.lib
 
 # riscv64-unknown-elf- or riscv64-linux-gnu-
 # perhaps in /opt/riscv/bin
