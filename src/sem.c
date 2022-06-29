@@ -15,7 +15,6 @@ extern void queue_waiting_push(thread_t);
 static void queue_sem_push(thread_t thr, sem_t id){
     thr->state = BLOCKED;
     thr->queue_next = NULL;
-    thr->lock = id;
 
     if(id->blocked_queue_front == NULL){
         id->blocked_queue_front = id->blocked_queue_back = thr;
@@ -33,7 +32,6 @@ static thread_t queue_sem_pop(sem_t id){
     if(id->blocked_queue_front == NULL) id->blocked_queue_back = NULL;
 
     ret->queue_next = NULL;
-    ret->lock = NULL;
 
     return ret;
 }

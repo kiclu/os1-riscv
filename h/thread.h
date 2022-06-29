@@ -61,13 +61,11 @@ typedef struct _thread{
 
     pid_t pid;
     _thread_state state;
-    struct _sem* lock;
-
     time_t cpu_time;
     time_t wake_time;
 
-    struct _thread* queue_next;
     void* stack_space;
+    struct _thread* queue_next;
 } _thread;
 
 typedef _thread* thread_t;

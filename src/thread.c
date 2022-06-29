@@ -41,8 +41,6 @@ int __thread_create(thread_t* handle, void(*start_routine)(void*), void* arg, vo
 
     (*handle)->pid = pid_counter++;
     (*handle)->state = NEW;
-    (*handle)->lock = 0;
-
     (*handle)->cpu_time = 0;
     (*handle)->wake_time = 0;
 
@@ -86,5 +84,4 @@ void thread_init(){
 
     kernel_thread->pid = 0;
     kernel_thread->state = RUNNING;
-    kernel_thread->lock = NULL;
 }
