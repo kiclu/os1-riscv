@@ -71,7 +71,6 @@ void __thread_dispatch(){
 
 // insert running thread into sleeping queue
 int __time_sleep(time_t time){
-    // if(running == kernel_thread) return;
     queue_sleeping_push(running, time);
     running = sched();
     return 0;

@@ -95,8 +95,8 @@ void queue_sleeping_push(thread_t thr, time_t time){
 // pop first elem from sleeping queue if wake time is greater than tick count
 static thread_t queue_sleeping_pop(){
     if(queue_sleeping.front == NULL) return NULL;
+    if(queue_sleeping.front->wake_time > tick_count) return NULL;
     thread_t res = queue_sleeping.front;
-    if(res->wake_time > tick_count) return NULL;
     queue_sleeping.front = queue_sleeping.front->queue_next;
     if(queue_sleeping.front == NULL) queue_sleeping.back = NULL;
     res->queue_next = NULL;
