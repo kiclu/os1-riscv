@@ -13,7 +13,7 @@ thread_t kernel_thread = NULL;
 
 extern void queue_new_push(thread_t);
 extern void queue_waiting_push(thread_t);
-extern void queue_sleeping_push(thread_t);
+extern void queue_sleeping_push(thread_t, time_t);
 
 static pid_t pid_counter = 2000;
 
@@ -69,8 +69,12 @@ void __thread_dispatch(){
     if(new != NULL) yield(new);
 }
 
-// TODO: implement __time_sleep
-int __time_sleep(time_t time){ return -1; }
+// insert running thread into sleeping queue
+int __time_sleep(time_t time){
+    queue_sleeping_push(running, time);
+    running = sched();
+    return 0;
+}
 
 void thread_init(){
     kernel_thread = running = (thread_t)__kmem_alloc(THREAD_SIZE);
