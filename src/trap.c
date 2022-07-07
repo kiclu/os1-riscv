@@ -8,8 +8,6 @@
 #include"../h/thread.h"
 #include"../h/sem.h"
 
-#include"../h/printf.h"
-
 #include"../lib/console.h"
 
 // scause interrupt flag
@@ -23,6 +21,7 @@ static void async_ctx_switch(){
     ++running->cpu_time;
     if(running->cpu_time >= DEFAULT_TIME_SLICE){
         __thread_dispatch();
+        async_ctx_switched = 1;
     }
 }
 
@@ -58,9 +57,6 @@ inline static void user_mode(){
 }
 
 static void syscall(_mode mode){
-    if(mode == MODE_SUPERVISOR && kernel_initialized) write_sepc(read_sepc() + 4);
-    else running->pc += 4;
-
     uint64* args = (uint64*)(&(running->context.a0));
     switch(args[0]){
         // void* mem_alloc(size_t);
@@ -139,30 +135,31 @@ void intr_handler(){
     }
     // exception
     else{
+        running->pc += 4;
         switch(scause){
             // instruction address misaligned
-            case 0x00: {} break;
+            case 0x00: { __puts("Exception : Instruction address misaligned!\n"); } break;
 
             // instruction access fault
             case 0x01: { __thread_exit(); } break;
 
             // illegal instruction
-            case 0x02: {} break;
+            case 0x02: { __puts("Exception : Illegal instruction!\n"); } break;
 
             // breakpoint
             case 0x03: {} break;
 
             // load address misaligned
-            case 0x04: {} break;
+            case 0x04: { __puts("Exception : Load address misaligned!\n"); } break;
 
             // load access fault
-            case 0x05: {} break;
+            case 0x05: { __puts("Exception : Load access fault!\n"); } break;
 
             // store/AMO address misaligned
-            case 0x06: {} break;
+            case 0x06: { __puts("Exception : Store/AMO address misaligned!\n"); } break;
 
             // store/AMO access fault
-            case 0x07: {} break;
+            case 0x07: { __puts("Exception : Store/AMO access fault!\n"); } break;
 
             // environment call from U mode
             case 0x08: { syscall(MODE_USER); } break;
@@ -207,10 +204,6 @@ void kintr_handler(){
             // supervisor external interrupt
             case 9: { hardware_interrupt(); } break;
         }
-    }
-    else{
-        // environment call from S mode
-        if((scause & 0xFF) == 0x09){ syscall(MODE_SUPERVISOR); }
     }
 
     write_sstatus(sstatus);

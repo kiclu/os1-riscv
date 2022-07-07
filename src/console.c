@@ -110,6 +110,8 @@ void __putc(char c){
     ++output_buffer.count;
 }
 
+void __puts(const char* str){ while(*str) __putc(*str++); }
+
 void console_handler(){}
 
 void console_init(){

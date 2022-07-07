@@ -10,6 +10,8 @@ extern "C"{
 void __putc(char);
 char __getc();
 
+void __puts(const char*);
+
 void console_handler();
 
 void console_init();

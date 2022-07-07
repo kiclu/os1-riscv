@@ -26,8 +26,8 @@ static void yield(thread_t new){
 }
 
 int __thread_create(thread_t* handle, void(*start_routine)(void*), void* arg, void* stack_space){
-    if(handle == NULL || start_routine == NULL) panic();
     if(stack_space == NULL) return -1;
+    if(handle == NULL || start_routine == NULL){ __kmem_free(stack_space); return -1; }
     
     *handle = __kmem_alloc(THREAD_SIZE);
     if((*handle) == NULL){
