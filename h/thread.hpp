@@ -34,6 +34,8 @@ class PeriodicThread : public Thread{
 protected:
     PeriodicThread(time_t period) : m_period(period){}
     virtual void periodicActivation(){}
+
+    virtual void run() final { do{ periodicActivation(); sleep(m_period); }while(1); }
 private:
     time_t m_period;
 };
