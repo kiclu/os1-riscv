@@ -9,7 +9,7 @@ extern "C"{
 #endif//__cplusplus
 
 typedef struct _sem{
-    int value;
+    uint value;
 
     thread_t blocked_queue_front;
     thread_t blocked_queue_back;

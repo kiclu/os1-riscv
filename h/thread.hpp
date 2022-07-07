@@ -21,11 +21,11 @@ public:
     static int sleep(time_t time){ return time_sleep(time); }
 protected:
     Thread(){}
-    virtual void run(){}
+    virtual void run(){ m_start_routine(m_arg); }
 private:
     thread_t m_handle = NULL;
-    void(*m_start_routine)(void*);
-    void* m_arg;
+    void(*m_start_routine)(void*) = NULL;
+    void* m_arg = NULL;
     
     friend void wrapper(void* thr){ if(thr) ((Thread*)thr)->run(); }
 };
@@ -34,6 +34,8 @@ class PeriodicThread : public Thread{
 protected:
     PeriodicThread(time_t period) : m_period(period){}
     virtual void periodicActivation(){}
+
+    virtual void run() final { do{ periodicActivation(); sleep(m_period); }while(1); }
 private:
     time_t m_period;
 };
